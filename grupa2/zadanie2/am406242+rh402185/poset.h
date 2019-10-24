@@ -1,25 +1,29 @@
+#ifndef POSET_H
+#define POSET_H
+
+#include <cstddef>
 
 namespace jnp1 
 {
-// a
+// a*
 unsigned long poset_new(void);
 
-// a
+// a*
 void poset_delete(unsigned long id);
 
-// a
-size_t poset_size(unsigned long id);
+// a*
+std::size_t poset_size(unsigned long id);
 
 // r
 bool poset_insert(unsigned long id, char const *value);
 // check if name is unique
 // add node
 
-// a
+// a*
 bool poset_remove(unsigned long id, char const *value);
 // remove edges
 
-// a
+// a*
 bool poset_add(unsigned long id, char const *value1, char const *value2);
 // check if new edge is ok
 // add new edge and neighbours 
@@ -37,3 +41,5 @@ bool poset_test(unsigned long id, char const *value1, char const *value2);
 void poset_clear(unsigned long id);
 // map clear
 }
+
+#endif // POSET_H
