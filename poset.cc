@@ -1,4 +1,5 @@
 #include "poset.h"
+
 #include <iostream>
 #include <ios>
 #include <string>
@@ -8,17 +9,20 @@
 #include <map>
 #include <set>
 
-// todo: change int to unsigned int. We don't need negative values.
-using Node = std::pair<std::set<int>, std::set<int>>; // first: in edges, second: out edges
-using Poset = std::pair<std::map< std::string, int>, std::map<int, Node>>;
-
-std::vector<std::optional<Poset>> poset_list;
-std::stack<int> available;
-
-void message(std::string message)
+namespace 
 {
-	static std::ios_base::Init stream;
-	std::cerr << message << std::endl;
+	// todo: change int to unsigned int. We don't need negative values.
+	using Node = std::pair<std::set<int>, std::set<int>>; // first: in edges, second: out edges
+	using Poset = std::pair<std::map< std::string, int>, std::map<int, Node>>;
+	
+	std::vector<std::optional<Poset>> poset_list;
+	std::stack<int> available;
+	
+	void message(std::string message)
+	{
+		static std::ios_base::Init stream;
+		std::cerr << message << std::endl;
+	}
 }
 
 unsigned long jnp1::poset_new(void) 
@@ -83,7 +87,7 @@ bool jnp1::poset_insert(unsigned long id, char const *value)
 
 bool jnp1::poset_remove(unsigned long id, char const *value)
 {
-	std::string element_name((value==nullptr)?"NULL":value);		
+	std::string element_name((value==nullptr)?"NULL":value);
 		
 	message("poset_remove(" + std::to_string(id) + ", \"" + element_name + "\")");
 	
