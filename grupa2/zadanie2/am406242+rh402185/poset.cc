@@ -9,6 +9,7 @@
 #include <map>
 #include <set>
 #include <cassert>
+#include <cstring>
 
 namespace
 {
@@ -247,6 +248,10 @@ bool jnp1::poset_del(unsigned long id, char const *value1, char const *value2)
     auto &[in2, out2] = graph[string_to_int[std :: string(value2)]];
     int index1 = string_to_int[value1];
     int index2 = string_to_int[value2];
+    if (index1 == index2) {
+        message("relation between two same elements cannot be removed");
+        return false;
+    }
     for (int outgoing : out) {
         if (outgoing != index1 && outgoing != index2 &&
             graph[outgoing].second.find(index2) != graph[outgoing].second.end()) {
