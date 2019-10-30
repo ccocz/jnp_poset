@@ -8,13 +8,15 @@
 #include <stack>
 #include <map>
 #include <set>
+#include <cassert>
 
 namespace 
 {
 	// todo: change int to unsigned int. We don't need negative values.
 	using Node = std::pair<std::set<int>, std::set<int>>; // first: in edges, second: out edges
-	using Poset = std::pair<std::map< std::string, int>, std::map<int, Node>>;
+	using Poset = std::tuple<std::map< std::string, int>, std::map<int, Node>, int>;
 	
+	Poset empty_poset;
 	std::vector<std::optional<Poset>> poset_list;
 	std::stack<int> available;
 	
@@ -28,8 +30,9 @@ namespace
 unsigned long jnp1::poset_new(void) 
 {
 	message("poset_new()");
-	Poset empty_poset;
 	int new_poset_index;
+
+	assert(std::get<2>(empty_poset) == 0);
 
 	if (available.empty())
 	{
@@ -69,7 +72,8 @@ std::size_t jnp1::poset_size(unsigned long id)
 	message("poset_size(" + std::to_string(id) + ")");
 	if (id < poset_list.size() && poset_list[id].has_value()) 
 	{
-		std::size_t size = poset_list[id].value().first.size();
+		auto [string_to_int, graph, max_id] = poset_list[id].value();
+		std::size_t size = graph.size();
 		message("poset_size: poset " + std::to_string(id) + " contains "
 		        + std::to_string(size) + " element(s)");
 		return size;
@@ -82,7 +86,23 @@ std::size_t jnp1::poset_size(unsigned long id)
 
 bool jnp1::poset_insert(unsigned long id, char const *value)
 {
-	return false;
+	std::string element_name((value==nullptr)?"NULL":value);
+	
+	message("poset_insert(" + std::to_string(id) + ", \"" + element_name + "\")");
+	
+	if (id >= poset_list.size() || !poset_list[id].has_value())
+	{
+		message("poset_insert: poset" + std::to_string(id) + "does not exist");
+		return false;
+	}
+	
+	if (value == nullptr)
+	{
+		message("poset_insert: invalid value (NULL)");
+		return false;
+	}
+	
+	
 }
 
 bool jnp1::poset_remove(unsigned long id, char const *value)
@@ -103,7 +123,7 @@ bool jnp1::poset_remove(unsigned long id, char const *value)
 		return false;
 	}
 
-	auto &[string_to_int, graph] = poset_list[id].value();
+	auto &[string_to_int, graph, max_id] = poset_list[id].value();
 
 	auto element_iterator = string_to_int.find(element_name);
 
@@ -161,7 +181,7 @@ bool jnp1::poset_add(unsigned long id, char const *value1, char const *value2)
 	if (value1 == nullptr || value2 == nullptr)
 		return false;
 	
-	auto &[string_to_int, graph] = poset_list[id].value();
+	auto &[string_to_int, graph, max_id] = poset_list[id].value();
 
 	auto element1_iterator = string_to_int.find(element1_name);
 	auto element2_iterator = string_to_int.find(element2_name);
