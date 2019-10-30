@@ -244,6 +244,8 @@ bool jnp1::poset_del(unsigned long id, char const *value1, char const *value2)
     }
     auto &[string_to_int, graph, max_index] = poset_list[id].value();
     auto &[in, out] = graph[string_to_int[std :: string(value1)]];
+    auto &[in2, out2] = graph[string_to_int[std :: string(value2)]];
+    int index1 = string_to_int[value1];
     int index2 = string_to_int[value2];
     for (int outgoing : out) {
         if (graph[outgoing].second.find(index2) != graph[outgoing].second.end()) {
@@ -252,6 +254,7 @@ bool jnp1::poset_del(unsigned long id, char const *value1, char const *value2)
         }
     }
     out.erase(index2);
+    in2.erase(index1);
     return true;
 }
 
