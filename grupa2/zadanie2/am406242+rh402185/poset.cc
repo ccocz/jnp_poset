@@ -106,6 +106,7 @@ bool jnp1::poset_insert(unsigned long id, char const *value)
         message("given " + std :: string(value) + "already exists");
         return false;
     }
+    graph[max_index].second.insert(max_index);
     string_to_int[name] = max_index++;
     return true;
 }
