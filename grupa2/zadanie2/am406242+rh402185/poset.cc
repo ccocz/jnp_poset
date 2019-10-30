@@ -83,7 +83,8 @@ std::size_t jnp1::poset_size(unsigned long id)
     message("poset_size(" + std::to_string(id) + ")");
     if (id < poset_list.size() && poset_list[id].has_value())
     {
-        std::size_t size = poset_list[id].value().first.size();
+    auto &[string_to_int, graph, max_index] = poset_list[id].value();
+        std::size_t size = graph.size();
         message("poset_size: poset " + std::to_string(id) + " contains "
                 + std::to_string(size) + " element(s)");
         return size;
@@ -127,7 +128,7 @@ bool jnp1::poset_remove(unsigned long id, char const *value)
         return false;
     }
 
-    auto &[string_to_int, graph] = poset_list[id].value();
+    auto &[string_to_int, graph, max_index] = poset_list[id].value();
 
     auto element_iterator = string_to_int.find(element_name);
 
@@ -185,7 +186,7 @@ bool jnp1::poset_add(unsigned long id, char const *value1, char const *value2)
     if (value1 == nullptr || value2 == nullptr)
         return false;
 
-    auto &[string_to_int, graph] = poset_list[id].value();
+    auto &[string_to_int, graph, max_index] = poset_list[id].value();
 
     auto element1_iterator = string_to_int.find(element1_name);
     auto element2_iterator = string_to_int.find(element2_name);
@@ -212,7 +213,10 @@ bool jnp1::poset_add(unsigned long id, char const *value1, char const *value2)
 
     auto &[in1, out1] = graph[index1];
     auto &[in2, out2] = graph[index2];
-    /// do you add connection between index1 and index2?
+    
+    out1.insert(index2);
+    in2.insert(index1);
+    
     for (auto iterator = in1.begin(); iterator != in1.end(); iterator++)
     {
         auto &[other_in, other_out] = graph[*iterator];
