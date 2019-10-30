@@ -248,7 +248,8 @@ bool jnp1::poset_del(unsigned long id, char const *value1, char const *value2)
     int index1 = string_to_int[value1];
     int index2 = string_to_int[value2];
     for (int outgoing : out) {
-        if (graph[outgoing].second.find(index2) != graph[outgoing].second.end()) {
+        if (outgoing != index1 && graph[outgoing].second.find(index2)
+            != graph[outgoing].second.end()) {
             message("relation cannot be removed");
             return false;
         }
