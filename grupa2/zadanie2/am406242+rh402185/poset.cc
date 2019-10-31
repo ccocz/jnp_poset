@@ -9,7 +9,6 @@
 #include <map>
 #include <set>
 #include <cassert>
-#include <cstring>
 
 namespace
 {
@@ -97,7 +96,8 @@ std::size_t jnp1::poset_size(unsigned long id)
     
     if (validArgument(id, "VALID", "VALID", "poset_size"))
     {
-        auto &[string_to_int, graph, max_index] = poset_list()[id].value();
+        //auto &[string_to_int, graph, max_index] = poset_list()[id].value();
+        auto &graph = std::get<1>(poset_list()[id].value());
         std::size_t size = graph.size();
         message("poset_size: poset " + std::to_string(id) + " contains "
                 + std::to_string(size) + " element(s)");
@@ -141,7 +141,9 @@ bool jnp1::poset_remove(unsigned long id, char const *value)
     if (!validArgument(id, value, "VALID", "poset_remove"))
         return false;
         
-    auto &[string_to_int, graph, max_index] = poset_list()[id].value();
+    //auto &[string_to_int, graph, max_index] = poset_list()[id].value();
+    auto &string_to_int = std::get<0>(poset_list()[id].value());
+    auto &graph = std::get<1>(poset_list()[id].value());
     auto element_iterator = string_to_int.find(element_name);
     if (element_iterator == string_to_int.end())
     {
@@ -154,13 +156,15 @@ bool jnp1::poset_remove(unsigned long id, char const *value)
     auto &[in, out] = graph[index];
     for (auto iterator = in.begin(); iterator != in.end(); iterator++)
     {
-        auto &[other_in, other_out] = graph[*iterator];
+        //auto &[other_in, other_out] = graph[*iterator];
+        auto &other_out = graph[*iterator].second;
         other_out.erase(other_out.find(index));
     }
     
     for (auto iterator = out.begin(); iterator != out.end(); iterator++)
     {
-        auto &[other_in, other_out] = graph[*iterator];
+        //auto &[other_in, other_out] = graph[*iterator];
+        auto &other_in = graph[*iterator].first;
         other_in.erase(other_in.find(index)); // todo: check if other_in.find(index) == end
     }
     
@@ -184,7 +188,9 @@ bool jnp1::poset_add(unsigned long id, char const *value1, char const *value2)
     if (!validArgument(id, value1, value2, "poset_add"))
         return false;
         
-    auto &[string_to_int, graph, max_index] = poset_list()[id].value();
+    //auto &[string_to_int, graph, max_index] = poset_list()[id].value();
+    auto &string_to_int = std::get<0>(poset_list()[id].value());
+    auto &graph = std::get<1>(poset_list()[id].value());
     
     auto element1_iterator = string_to_int.find(element1_name);
     auto element2_iterator = string_to_int.find(element2_name);
@@ -208,8 +214,10 @@ bool jnp1::poset_add(unsigned long id, char const *value1, char const *value2)
         return false;
     }
 
-    auto &[in1, out1] = graph[index1];
-    auto &[in2, out2] = graph[index2];
+    //auto &[in1, out1] = graph[index1];
+    auto &in1 = graph[index1].first;
+    //auto &[in2, out2] = graph[index2];
+    auto &out2 = graph[index2].second;
 
     std::vector<int> in1_list;
     std::vector<int> out2_list;
@@ -222,10 +230,12 @@ bool jnp1::poset_add(unsigned long id, char const *value1, char const *value2)
     
     for (int a : in1_list)
     {
-        auto &[in_a, out_a] = graph[a];
+        //auto &[in_a, out_a] = graph[a];
+        auto &out_a = graph[a].second;
         for (int b : out2_list)
         {
-            auto &[in_b, out_b] = graph[b];
+            //auto &[in_b, out_b] = graph[b];
+            auto &in_b = graph[b].first;
             out_a.insert(b);
             in_b.insert(a);
         }
@@ -255,9 +265,15 @@ bool jnp1::poset_del(unsigned long id, char const *value1, char const *value2)
         return false;
     }
     
-    auto &[string_to_int, graph, max_index] = poset_list()[id].value();
-    auto &[in, out] = graph[string_to_int[element1_name]];
-    auto &[in2, out2] = graph[string_to_int[element2_name]];
+    //auto &[string_to_int, graph, max_index] = poset_list()[id].value();
+    auto &string_to_int = std::get<0>(poset_list()[id].value());
+    auto &graph = std::get<1>(poset_list()[id].value());
+    
+    //auto &[in, out] = graph[string_to_int[element1_name]];
+    auto &out = graph[string_to_int[element1_name]].second;
+    //auto &[in2, out2] = graph[string_to_int[element2_name]];
+    auto &in2 = graph[string_to_int[element2_name]].first;
+    
     int index1 = string_to_int[value1];
     int index2 = string_to_int[value2];
     if (index1 == index2) 
@@ -298,7 +314,10 @@ bool jnp1::poset_test(unsigned long id, char const *value1, char const *value2)
     if (!validArgument(id, value1, value2, "poset_test")) 
         return false;
     
-    auto &[string_to_int, graph, max_index] = poset_list()[id].value();
+    //auto &[string_to_int, graph, max_index] = poset_list()[id].value();
+    auto &string_to_int = std::get<0>(poset_list()[id].value());
+    auto &graph = std::get<1>(poset_list()[id].value());
+    
     auto element1_iterator = string_to_int.find(name1);
     auto element2_iterator = string_to_int.find(name2);
     if (element1_iterator == string_to_int.end() ||
@@ -311,7 +330,8 @@ bool jnp1::poset_test(unsigned long id, char const *value1, char const *value2)
     
     int index2 = element2_iterator -> second;
     int index1 = element1_iterator -> second;
-    auto &[in, out] = graph[index1];
+    //auto &[in, out] = graph[index1];
+    auto &out = graph[index1].second;
     
     if (out.find(index2) != out.end())
     {
