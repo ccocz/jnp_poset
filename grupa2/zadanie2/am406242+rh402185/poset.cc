@@ -13,49 +13,47 @@
 
 namespace
 {
-    // todo: change int to unsigned int. We don't need negative values.
-    using Node = std::pair<std::set<int>, std::set<int>>; // first: in edges, second: out edges
-    using Poset = std::tuple<std::map< std::string, int>, std::map<int, Node>, int>;
+using Node = std::pair<std::set<int>, std::set<int>>; // first: in edges, second: out edges
+using Poset = std::tuple<std::map< std::string, int>, std::map<int, Node>, int>;
 
-    std::vector<std::optional<Poset>> &poset_list()
+std::vector<std::optional<Poset>> &poset_list()
+{
+    static std::vector<std::optional<Poset>> list;
+    return list;
+}
+
+std::stack<int> &available()
+{
+    static std::stack<int> stack;
+    return stack;
+}
+
+void message(std::string message)
+{
+    static std::ios_base::Init stream;
+    std::cerr << message << std::endl;
+}
+
+// Checks if arguments are correct, and prints error messages about wrong arguments
+bool validArgument(unsigned int id, const char *value1, const char *value2, std::string function_name) 
+{
+    if (id >= poset_list().size() || !poset_list()[id].has_value()) 
     {
-        static std::vector<std::optional<Poset>> list;
-        return list;
+        message(function_name + ": poset " + std::to_string(id) + " does not exist");
+        return false;
     }
     
-    std::stack<int> &available()
-    {
-        static std::stack<int> stack;
-        return stack;
-    }
+    if (value1 == nullptr)
+        message(function_name + ": invalid value1 (NULL)");
 
-    void message(std::string message)
-    {
-        static std::ios_base::Init stream;
-        std::cerr << message << std::endl;
-    }
+    if (value2 == nullptr)
+        message(function_name + ": invalid value2 (NULL)");
 
-    // Checks if arguments are correct, and prints error messages about wrong arguments
-    bool validArgument(unsigned int id, const char *value1, const char *value2, std::string function_name) 
-    {
-        if (id >= poset_list().size() || !poset_list()[id].has_value()) 
-        {
-            message(function_name + ": poset " + std::to_string(id) + " does not exist");
-            return false;
-        }
+    if (value1 == nullptr || value2 == nullptr)
+        return false;
         
-        if (value1 == nullptr)
-            message(function_name + ": invalid value1 (NULL)");
-
-        if (value2 == nullptr)
-            message(function_name + ": invalid value2 (NULL)");
-
-        if (value1 == nullptr || value2 == nullptr)
-            return false;
-            
-        return true;
-    }
-
+    return true;
+}
 }
 
 unsigned long jnp1::poset_new(void)
